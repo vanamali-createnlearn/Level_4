@@ -1,0 +1,50 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+local speedUpTemplate = ReplicatedStorage:WaitForChild("SpeedUp")
+
+-- Configuration
+local centerCFrame = CFrame.new(0, 5, 0)
+local radius = 50
+local constantY = centerCFrame.Position.Y
+
+local maxActiveParts = 5
+local spawnEvery = 5 -- seconds
+local spawnCount = 3
+local destroyCount = 2
+
+-- Folder to hold active parts
+local speedUpFolder = Instance.new("Folder")
+speedUpFolder.Name = "ActiveSpeedUps"
+speedUpFolder.Parent = Workspace
+
+local function getRandomXZPosition()
+	local angle = math.random() * 2 * math.pi
+	local distance = math.random() * radius
+	local offsetX = math.cos(angle) * distance
+	local offsetZ = math.sin(angle) * distance
+	return Vector3.new(centerCFrame.Position.X + offsetX, constantY, centerCFrame.Position.Z + offsetZ)
+end
+
+-- Main loop
+while true do
+	-- Remove older ones if too many
+	local existing = speedUpFolder:GetChildren()
+	if #existing >= maxActiveParts then
+		for i = 1, destroyCount do
+			if #existing == 0 then break end
+			local toDestroy = table.remove(existing, math.random(1, #existing))
+			toDestroy:Destroy()
+		end
+	end
+
+	-- Spawn new ones
+	for i = 1, spawnCount do
+		local clone = speedUpTemplate:Clone()
+		clone.CFrame = CFrame.new(getRandomXZPosition())
+		clone.Anchored = true -- ✅ ensure it doesn't fall
+		clone.Parent = speedUpFolder
+	end
+
+	wait(spawnEvery)
+end
