@@ -1,0 +1,27 @@
+local part = script.Parent
+local SPEED_MULTIPLIER = 2
+local BOOST_DURATION = 5
+
+part.Touched:Connect(function(hit)
+	local character = hit:FindFirstAncestorOfClass("Model")
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+	if humanoid then
+		local originalSpeed = humanoid.WalkSpeed
+		humanoid.WalkSpeed = originalSpeed * SPEED_MULTIPLIER
+
+		print(character.Name .. " got a speed boost!")
+
+		-- Destroy the part so others can't reuse it
+		part:Destroy()
+
+		-- Reset speed after 5 seconds
+		task.delay(BOOST_DURATION, function()
+			-- Make sure the humanoid still exists
+			if humanoid and humanoid.Parent then
+				humanoid.WalkSpeed = originalSpeed
+				print(character.Name .. "'s speed boost ended.")
+			end
+		end)
+	end
+end)
