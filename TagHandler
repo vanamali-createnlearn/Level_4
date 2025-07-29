@@ -1,0 +1,53 @@
+local Players = game:GetService("Players")
+
+local tagger = nil
+local lastTagTime = 0
+local TAG_COOLDOWN = 2
+
+-- Assign the tagger if none exists
+local function assignTagger()
+	if not tagger then
+		local allPlayers = Players:GetPlayers()
+		if #allPlayers > 0 then
+			tagger = allPlayers[math.random(1, #allPlayers)]
+			print(tagger.Name .. " is the first tagger!")
+		end
+	end
+end
+
+-- Handle when a tagger touches another player
+local function handleTouch(toucher, hit)
+	if toucher ~= tagger then return end
+
+	local targetChar = hit:FindFirstAncestorOfClass("Model")
+	local targetPlayer = Players:GetPlayerFromCharacter(targetChar)
+
+	if targetPlayer and targetPlayer ~= tagger then
+		local now = tick()
+		if now - lastTagTime >= TAG_COOLDOWN then
+			tagger = targetPlayer
+			lastTagTime = now
+			print(tagger.Name .. " is now 'It'!")
+		end
+	end
+end
+
+-- Setup for each player
+local function onPlayerAdded(player)
+	player.CharacterAdded:Connect(function(character)
+		local humanoid = character:WaitForChild("Humanoid")
+		humanoid.Touched:Connect(function(hit)
+			handleTouch(player, hit)
+		end)
+
+		-- Try assigning a tagger after character loads
+		task.delay(1, assignTagger)
+	end)
+end
+
+-- Connect to current and future players
+Players.PlayerAdded:Connect(onPlayerAdded)
+for _, player in ipairs(Players:GetPlayers()) do
+	onPlayerAdded(player)
+end
+
