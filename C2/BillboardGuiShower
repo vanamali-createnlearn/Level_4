@@ -1,0 +1,43 @@
+--Under ScreenGui create a billboardgui - name it Floating Text 
+--add a TextLabel, set the text to "+1" and design it and size it to your choice
+--After that cut and paste or drag the gui into ReplicatedStorage
+--In ReplicatedStorage create a new remote event called "ShowFloatingText"
+--After all those steps Create a localscript in StarterPlayerScripts and paste this
+
+
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local event = ReplicatedStorage:WaitForChild("ShowFloatingText")
+local floatingTemplate = ReplicatedStorage:WaitForChild("FloatingText")
+
+event.OnClientEvent:Connect(function()
+	local player = Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local head = character:WaitForChild("Head")
+
+	local clone = floatingTemplate:Clone()
+	clone.Adornee = head
+	clone.Parent = head
+	clone.StudsOffset = Vector3.new(0, 2.5, 0)
+	clone.Size = UDim2.new(0, 100, 0, 50)
+
+	local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	TweenService:Create(clone, tweenInfo, { StudsOffset = Vector3.new(0, 5, 0) }):Play()
+
+	local label = clone:FindFirstChildOfClass("TextLabel")
+	if label then
+		TweenService:Create(label, tweenInfo, {
+			TextTransparency = 1,
+			TextStrokeTransparency = 1
+		}):Play()
+	end
+
+	task.delay(2.1, function()
+		clone:Destroy()
+	end)
+end)
+
+
