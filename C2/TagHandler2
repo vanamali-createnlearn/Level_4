@@ -1,0 +1,14 @@
+--add this part to your existing TagHandler file after adding the Leaderstats file
+-- add this after the line "if now - lastTagTime >= TAG_COOLDOWN then"
+
+
+local stats = tagger:FindFirstChild("leaderstats")
+			local points = stats and stats:FindFirstChild("Tags")
+			if points then
+				points.Value += 1
+				print(tagger.Name .. " tagged " .. targetPlayer.Name .. " and earned 1 point!")
+			end
+      --the below part is to show a "+1" gui effect on the head of the player using a billboard gui
+			local ReplicatedStorage = game:GetService("ReplicatedStorage")
+			local event = ReplicatedStorage:WaitForChild("ShowFloatingText")
+			event:FireClient(tagger, "+1")
