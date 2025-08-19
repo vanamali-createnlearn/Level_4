@@ -1,0 +1,27 @@
+--Create another billboardgui with a TextLabel, make the text say "The Tag" or "IT!" to indicate he's the player that runs behind
+--Rename it to "TagBillboard" and place it in "Replicated Storage". 
+--After that go into the Tag script in ServerScriptService and do the following
+
+
+
+--Enter these lines in the tag script after the line "local TAG_COOLDOWN = 2"
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local tagBillboard = ReplicatedStorage:WaitForChild("TagBillboard")
+local function setTaggerBillboard(newTagger)
+	if newTagger and newTagger.Character then
+		local hrp = newTagger.Character:FindFirstChild("HumanoidRootPart")
+		if hrp then
+			tagBillboard.Adornee = hrp
+			tagBillboard.Parent = workspace -- keep billboard in workspace
+		end
+	end
+end
+
+--add this line at the end of if block in assignTagger() function
+setTaggerBillboard(tagger)
+
+--replace last three lines of handleTouch() with this
+tagger = targetPlayer
+setTaggerBillboard(tagger) 
+lastTagTime = now
