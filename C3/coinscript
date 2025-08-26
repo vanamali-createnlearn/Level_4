@@ -1,0 +1,15 @@
+-- Coin Script
+local coin = script.Parent
+local clickDetector = coin:WaitForChild("ClickDetector")
+
+clickDetector.MouseClick:Connect(function(player)
+	local stats = player:FindFirstChild("leaderstats")
+	if stats then
+		local coins = stats:FindFirstChild("Coins")
+		if coins then
+			coins.Value += 1
+		end
+	end
+
+	coin:Destroy() -- Remove the coin once collected
+end)
