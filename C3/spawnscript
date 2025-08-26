@@ -1,0 +1,29 @@
+-- Coin Spawner
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+local coinTemplate = ReplicatedStorage:WaitForChild("Coin")
+
+-- Settings
+local spawnCenter = CFrame.new(0, 5, 0) -- center point
+local spawnRadius = 50 -- radius around center
+local coinCount = 20 -- how many coins to spawn
+local fixedY = 5 -- height at which coins appear
+
+-- Function to spawn a coin
+local function spawnCoin()
+	local angle = math.random() * 2 * math.pi
+	local distance = math.random() * spawnRadius
+	local x = spawnCenter.X + math.cos(angle) * distance
+	local z = spawnCenter.Z + math.sin(angle) * distance
+	local position = Vector3.new(x, fixedY, z)
+
+	local coinClone = coinTemplate:Clone()
+	coinClone.CFrame = CFrame.new(position)
+	coinClone.Parent = Workspace
+end
+
+-- Initial spawn
+for i = 1, coinCount do
+	spawnCoin()
+end
