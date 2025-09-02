@@ -1,0 +1,11 @@
+--Add a ScreenGui & A textlabel inside it and name it "TimerLabel"
+-- LocalScript inside ScreenGui
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remote = ReplicatedStorage:WaitForChild("UpdateTimer")
+
+local label = script.Parent:WaitForChild("TimerLabel")
+
+remote.OnClientEvent:Connect(function(message)
+	label.Text = tostring(message)
+end)
+
