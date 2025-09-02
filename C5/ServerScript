@@ -1,0 +1,23 @@
+-- Place inside ServerScriptService
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BlockLogic = require(game.ServerScriptService.BlockLogic)
+
+-- RemoteEvent for GUI updates
+local remote = ReplicatedStorage:FindFirstChild("UpdateTimer")
+if not remote then
+	remote = Instance.new("RemoteEvent")
+	remote.Name = "UpdateTimer"
+	remote.Parent = ReplicatedStorage
+end
+
+-- Run 5-second timer
+for i = 10, 1, -1 do
+	remote:FireAllClients(i)
+	task.wait(1)
+end
+
+remote:FireAllClients("Go!")
+
+-- Highlight all pairs
+local pairs = BlockLogic.HighlightAllPairs()
+print("All pairs stored", pairs)
