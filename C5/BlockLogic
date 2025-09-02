@@ -1,0 +1,36 @@
+-- ServerScriptService/BlockLogic
+local module = {}
+local DEFAULT_COLOR = Color3.fromRGB(255, 255, 255)
+
+local function shuffle(t)
+	for i = #t, 2, -1 do
+		local j = math.random(i)
+		t[i], t[j] = t[j], t[i]
+	end
+end
+
+function module.HighlightAllPairs()
+	-- collect and shuffle blocks
+	local blocks = {}
+	for _, obj in ipairs(workspace:GetChildren()) do
+		if obj:IsA("BasePart") and obj.Name:match("^Block%d+$") then
+			table.insert(blocks, obj)
+		end
+	end
+	shuffle(blocks)
+
+	-- assign pairs
+	local allPairs = {}
+	for i = 1, #blocks-1, 2 do
+		local b1, b2 = blocks[i], blocks[i+1]
+		local color = Color3.fromRGB(math.random(255), math.random(255), math.random(255))
+		b1.Color, b2.Color = color, color
+		allPairs[#allPairs+1] = {[b1.Name]=color, [b2.Name]=color}
+	end
+
+	task.wait(3)
+	for _, b in ipairs(blocks) do b.Color = DEFAULT_COLOR end
+	return allPairs
+end
+
+return module
