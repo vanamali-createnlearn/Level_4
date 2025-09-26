@@ -1,0 +1,9 @@
+--in previously written ModuleScript look for the line "local module = {}" and paste the line below
+module.StoredPairs = {}  
+
+--after that in HighlightAllPairs() function, BEFORE the line "task.wait(3)" write the line:
+module.StoredPairs = allPairs
+
+
+--what these two lines does is, if you remember the modulescript created pairs and their colors, we store them in a modulescript format (that's why the module.StoredPairs),
+--so that the same table can be accesssed in our next script while we check sequence of clicks.
