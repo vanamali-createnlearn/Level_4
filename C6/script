@@ -1,0 +1,86 @@
+--paste inside ServerScriptService. This script colours the block with assigned colour, and if the next block clicked is also of the same colour,
+--then it counts that pair as matched,
+--otherwise it resets both clicked blocks colours to default
+--once all pairs are matched we give a print statement saying all pairs have been matched.
+
+local BlockLogic = require(game.ServerScriptService.BlockLogic)
+local DEFAULT_COLOR = Color3.fromRGB(255, 255, 255)
+
+local matchedBlocks = {}
+local clicked = {}
+local totalBlocks = 0
+
+-- wait until pairs are assigned by your timer/countdown script
+repeat task.wait(0.1) until BlockLogic.StoredPairs and #BlockLogic.StoredPairs > 0
+local allPairs = BlockLogic.StoredPairs
+
+-- count total blocks
+for _, pair in ipairs(allPairs) do
+	for blockName, _ in pairs(pair) do
+		totalBlocks += 1
+	end
+end
+
+-- helper: get assigned color for a block
+local function getBlockColor(blockName)
+	for _, pair in ipairs(allPairs) do
+		for name, color in pairs(pair) do
+			if name == blockName then
+				return color
+			end
+		end
+	end
+end
+
+-- handle clicks
+local function onBlockClick(block)
+	if matchedBlocks[block.Name] then return end
+	if clicked[1] and clicked[1] == block then return end -- prevent double-click
+
+	block.Color = getBlockColor(block.Name)
+	table.insert(clicked, block)
+
+	if #clicked == 2 then
+		local b1, b2 = clicked[1], clicked[2]
+		local c1, c2 = getBlockColor(b1.Name), getBlockColor(b2.Name)
+
+		if c1 and c1 == c2 then
+			-- ✅ matched
+			matchedBlocks[b1.Name], matchedBlocks[b2.Name] = true, true
+			print("Match found:", b1.Name, b2.Name)
+
+			-- ✅ proper win check
+			local matchedCount = 0
+			for _ in pairs(matchedBlocks) do
+				matchedCount += 1
+			end
+			if matchedCount == totalBlocks then
+				print("🎉 GAME WON! All blocks matched!")
+			end
+		else
+			-- ❌ mismatch → hide after 1 second
+			task.delay(1, function()
+				if not matchedBlocks[b1.Name] then b1.Color = DEFAULT_COLOR end
+				if not matchedBlocks[b2.Name] then b2.Color = DEFAULT_COLOR end
+			end)
+		end
+		clicked = {}
+	end
+end
+
+-- connect ClickDetectors for all blocks in StoredPairs
+for _, pair in ipairs(allPairs) do
+	for blockName, _ in pairs(pair) do
+		local block = workspace:FindFirstChild(blockName)
+		if block and block:IsA("BasePart") then
+			local cd = block:FindFirstChildOfClass("ClickDetector")
+			if not cd then
+				cd = Instance.new("ClickDetector")
+				cd.Parent = block
+			end
+			cd.MouseClick:Connect(function(player)
+				onBlockClick(block)
+			end)
+		end
+	end
+end
